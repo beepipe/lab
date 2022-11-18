@@ -1,38 +1,38 @@
-import unittest
+import pytest
 from account import *
 
-class MyTestCase(unittest.TestCase):
+class Test:
 
-    delta_value = 0.001
-
-    def setUp(self):
+    def setup_method(self):
         self.account1 = Account('test1')
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.account1
 
     def test_init(self):
-        self.assertEqual(self.account1.get_name(), 'test1')
-        self.assertEqual(self.account1.get_balance(), 0)
-
+        assert self.account1.get_name() == 'test1'
+        assert self.account1.get_balance() == 0
 
     def test_deposit(self):
-        self.assertEqual(self.account1.deposit(1000), True)
-        self.assertEqual(self.account1.deposit(-1000), False)
-        self.assertEqual(self.account1.deposit(1000.45), True)
-        self.assertEqual(self.account1.deposit(-1000.30), False)
-
-        self.assertRaises(TypeError, self.account1.deposit, 'string')
-
+        assert self.account1.deposit(1000) == True
+        assert self.account1.get_balance() == 1000
+        assert self.account1.deposit(-1000) == False
+        assert self.account1.get_balance() == 1000
+        assert self.account1.deposit(1000.45) == True
+        assert self.account1.get_balance() == pytest.approx(2000.45, abs=0.001)
+        assert self.account1.deposit(0) == False
+        assert self.account1.get_balance() == pytest.approx(2000.45, abs=0.001)
 
     def test_withdraw(self):
-        self.assertEqual(self.account1.withdraw(1000), False)
-        self.assertEqual(self.account1.withdraw(-1000), False)
-        self.assertEqual(self.account1.withdraw(1000.45), False)
-        self.assertEqual(self.account1.withdraw(-1000.30), False)
+        assert self.account1.withdraw(1000) == False
+        assert self.account1.get_balance() == 0
+        assert self.account1.withdraw(0) == False
+        assert self.account1.get_balance() == 0
+        self.account1.deposit(5000)
+        assert self.account1.withdraw(1000.45) == True
+        assert self.account1.get_balance() == pytest.approx(3999.55, abs=0.001)
+        assert self.account1.withdraw(-1000) == False
+        assert self.account1.get_balance() == pytest.approx(3999.55, abs=0.001)
 
-        self.assertRaises(TypeError, self.account1.withdraw, 'string')
 
 
-if __name__ == '__main__':
-    unittest.main()
